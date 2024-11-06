@@ -1,0 +1,3 @@
+1;Inferno;456/785;srpski;496
+2;To kill a mockingbird;478/956;engleski;320
+3;Ostrvo;985/784;srpski;473
