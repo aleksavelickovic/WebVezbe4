@@ -124,6 +124,8 @@ public class KnjigeController implements ApplicationContextAware {
 			tableNode.appendChild(rowElement);
 		}
 		body.appendChild(tableNode);
+		Element Href = new Element(Tag.valueOf("a"), "").attr("href", bURL).text("Pocetna");
+		body.appendChild(Href);
 		out.write(document.html());
 		
 		return;
@@ -169,7 +171,9 @@ public class KnjigeController implements ApplicationContextAware {
 	// POST: knjige/delete
 	@PostMapping(value="/delete")
 	public void delete(@RequestParam Long id, HttpServletResponse response) throws IOException {
-		
+		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
+		knjige.delete(id);
+		response.sendRedirect(bURL + "knjige");		
 	}
 	
 	/** pribavnjanje HTML stanice za prikaz određenog entiteta , get zahtev */
@@ -184,7 +188,7 @@ public class KnjigeController implements ApplicationContextAware {
 				+ "<html>\r\n"
 				+ "<head>\r\n"
 				+ "<meta charset=\"UTF-8\">\r\n"
-				+ "<title>Prikaz detalja i izmena knjige</title>\r\n"
+				+ "<title>Prikaz detalja, izmena i brisanje knjige</title>\r\n"
 				+ "</head>\r\n"
 				+ "<body>\r\n"
 				+ "	<form action=\"/PrviMavenVebProjekat/knjige/edit?id="+knjiga.getId()+"\" method=\"post\">\r\n"
@@ -198,6 +202,10 @@ public class KnjigeController implements ApplicationContextAware {
 				+ "		<input type = \"number\" name= \"brojStranica\" value=\""+knjiga.getBrojStranica()+"\" /> <br>\r\n"
 				+ "		<input type = \"submit\" value = \"Potvrdi\"/>\r\n"
 				+ "	</form>\r\n"
+				+ "	<form action=\"/PrviMavenVebProjekat/knjige/delete?id="+knjiga.getId()+"\" method=\"post\">\r\n"
+				+ "\r\n"
+				+ "		<input type = \"submit\" value = \"Obrisi ovu knjigu\"/>\r\n"
+				+ "	</form>"
 				+ "</body>\r\n"
 				+ "</html>";
 	}
