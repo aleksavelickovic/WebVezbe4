@@ -152,8 +152,17 @@ public class KnjigeController implements ApplicationContextAware {
 	/** obrada podataka forme za izmenu postojećeg entiteta, post zahtev */
 	// POST: knjige/edit
 	@PostMapping(value="/edit")
-	public void edit(@ModelAttribute Knjiga knjigaEdited , HttpServletResponse response) throws IOException {	
-	
+	public void edit(@ModelAttribute Knjiga knjigaEdited , HttpServletResponse response) throws IOException {
+		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
+		Knjiga knjigaOriginal = knjige.findOne(knjigaEdited.getId());
+		
+		knjigaOriginal.setNaziv(knjigaEdited.getNaziv());
+		knjigaOriginal.setRegistarskiBrojPrimerka(knjigaEdited.getRegistarskiBrojPrimerka());
+		knjigaOriginal.setJezik(knjigaEdited.getJezik());
+		knjigaOriginal.setBrojStranica(knjigaEdited.getBrojStranica());
+		
+		response.sendRedirect(bURL + "knjige");
+		return;
 	}
 	
 	/** obrada podataka forme za za brisanje postojećeg entiteta, post zahtev */
@@ -174,18 +183,21 @@ public class KnjigeController implements ApplicationContextAware {
 		return "<!DOCTYPE html>\r\n"
 				+ "<html>\r\n"
 				+ "<head>\r\n"
-				+ "<meta charset=\"UTF-8\"> \r\n"
-				+ "<title>Detalji o izabranoj knjizi</title>\r\n"
-				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"/PrviMavenVebProjekat/css/StiloviTabela.css\"/>\r\n"
-				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"/PrviMavenVebProjekat/css/StiloviHorizontalniMeni.css\"/>		\r\n"
+				+ "<meta charset=\"UTF-8\">\r\n"
+				+ "<title>Prikaz detalja i izmena knjige</title>\r\n"
 				+ "</head>\r\n"
 				+ "<body>\r\n"
-				+ "\r\n"
-				+ "<h1>Naziv: "+knjiga.getNaziv()+"</h1>\r\n"
-				+ "<h1>Registarski Broj: "+knjiga.getRegistarskiBrojPrimerka()+"</h1>\r\n"
-				+ "<h1>Jezik: "+knjiga.getJezik()+"</h1>\r\n"
-				+ "<h1>Broj Stranica: "+knjiga.getBrojStranica()+"</h1>\r\n"
-				+ "\r\n"
+				+ "	<form action=\"/PrviMavenVebProjekat/knjige/edit?id="+knjiga.getId()+"\" method=\"post\">\r\n"
+				+ "		<label for=\"naziv\">Naziv: </label>\r\n"
+				+ "		<input type = \"text\" name= \"naziv\" value=\""+knjiga.getNaziv()+"\" /> <br>\r\n"
+				+ "		<label for=\"registarskiBrojPrimerka\">registarskiBrojPrimerka: </label>\r\n"
+				+ "		<input type = \"text\" name= \"registarskiBrojPrimerka\" value=\""+knjiga.getRegistarskiBrojPrimerka()+"\" /> <br>\r\n"
+				+ "		<label for=\"jezik\">Jezik: </label>\r\n"
+				+ "		<input type = \"text\" name= \"jezik\" value=\""+knjiga.getJezik()+"\" /> <br>\r\n"
+				+ "		<label for=\"brojStranica\">Broj Stranica: </label>\r\n"
+				+ "		<input type = \"number\" name= \"brojStranica\" value=\""+knjiga.getBrojStranica()+"\" /> <br>\r\n"
+				+ "		<input type = \"submit\" value = \"Potvrdi\"/>\r\n"
+				+ "	</form>\r\n"
 				+ "</body>\r\n"
 				+ "</html>";
 	}
