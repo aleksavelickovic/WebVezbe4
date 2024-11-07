@@ -40,7 +40,7 @@ public class KnjigeController implements ApplicationContextAware {
 	
 	@Autowired
 	private ServletContext servletContext;
-	private String bURL = "/knjige"; 
+	private String bURL; 
 	
 	@Autowired
 	private ApplicationContext applicationContext;
@@ -108,12 +108,16 @@ public class KnjigeController implements ApplicationContextAware {
 			Element tdRegNo = new Element(Tag.valueOf("td"), "").text(knjiga.getRegistarskiBrojPrimerka());
 			Element tdLaungauge = new Element(Tag.valueOf("td"), "").text(knjiga.getJezik());
 			Element tdPages = new Element(Tag.valueOf("td"), "").text(String.valueOf(knjiga.getBrojStranica()));
+			Element tdButton = new Element(Tag.valueOf("td"), "");
+			Element Href = new Element(Tag.valueOf("a"), "").attr("href", "/index.html").text("Obrisi");
+			tdButton.appendChild(Href);
 			
 			rowElement.appendChild(tdIdElement);
 			rowElement.appendChild(tdName);
 			rowElement.appendChild(tdRegNo);
 			rowElement.appendChild(tdLaungauge);
 			rowElement.appendChild(tdPages);
+			rowElement.appendChild(tdButton);
 			
 			tableNode.appendChild(rowElement);
 		}
