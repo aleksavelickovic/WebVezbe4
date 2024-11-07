@@ -91,12 +91,14 @@ public class KnjigeController implements ApplicationContextAware {
 		Element thRegNo = new Element(Tag.valueOf("th"), "").text("Reg No.");
 		Element thLang = new Element(Tag.valueOf("th"), "").text("Laungauge");
 		Element thPages = new Element(Tag.valueOf("th"), "").text("Pages");
+		Element thDetalji = new Element(Tag.valueOf("th"), "").text("Detalji");
 		
 		thRow.appendChild(thId);
 		thRow.appendChild(thName);
 		thRow.appendChild(thRegNo);
 		thRow.appendChild(thLang);
 		thRow.appendChild(thPages);
+		thRow.appendChild(thDetalji);
 		
 		tableNode.appendChild(caption);
 		tableNode.appendChild(thRow);
@@ -109,7 +111,7 @@ public class KnjigeController implements ApplicationContextAware {
 			Element tdLaungauge = new Element(Tag.valueOf("td"), "").text(knjiga.getJezik());
 			Element tdPages = new Element(Tag.valueOf("td"), "").text(String.valueOf(knjiga.getBrojStranica()));
 			Element tdButton = new Element(Tag.valueOf("td"), "");
-			Element Href = new Element(Tag.valueOf("a"), "").attr("href", "/index.html").text("Obrisi");
+			Element Href = new Element(Tag.valueOf("a"), "").attr("href", bURL + "knjige/details?id=" + knjiga.getId()).text("Detalji");
 			tdButton.appendChild(Href);
 			
 			rowElement.appendChild(tdIdElement);
@@ -165,7 +167,26 @@ public class KnjigeController implements ApplicationContextAware {
 	// GET: knjige/details?id=1
 	@GetMapping(value="/details")
 	@ResponseBody
-	public void details(@RequestParam Long id) {	
-		return;
+	public String details(@RequestParam Long id) {
+		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
+		Knjiga knjiga = knjige.findOne(id);
+		
+		return "<!DOCTYPE html>\r\n"
+				+ "<html>\r\n"
+				+ "<head>\r\n"
+				+ "<meta charset=\"UTF-8\"> \r\n"
+				+ "<title>Detalji o izabranoj knjizi</title>\r\n"
+				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"/PrviMavenVebProjekat/css/StiloviTabela.css\"/>\r\n"
+				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"/PrviMavenVebProjekat/css/StiloviHorizontalniMeni.css\"/>		\r\n"
+				+ "</head>\r\n"
+				+ "<body>\r\n"
+				+ "\r\n"
+				+ "<h1>Naziv: "+knjiga.getNaziv()+"</h1>\r\n"
+				+ "<h1>Registarski Broj: "+knjiga.getRegistarskiBrojPrimerka()+"</h1>\r\n"
+				+ "<h1>Jezik: "+knjiga.getJezik()+"</h1>\r\n"
+				+ "<h1>Broj Stranica: "+knjiga.getBrojStranica()+"</h1>\r\n"
+				+ "\r\n"
+				+ "</body>\r\n"
+				+ "</html>";
 	}
 }
