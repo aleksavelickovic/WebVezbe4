@@ -33,56 +33,58 @@ import com.ftn.PrviMavenVebProjekat.model.Knjiga;
 import com.ftn.PrviMavenVebProjekat.model.Knjige;
 
 @Controller
-@RequestMapping(value="/knjige")
+@RequestMapping(value = "/knjige")
 public class KnjigeController implements ApplicationContextAware {
 
 	public static final String KNJIGE_KEY = "knjige";
-	
+
 	@Autowired
 	private ServletContext servletContext;
-	private String bURL; 
-	
+	private String bURL;
+
 	@Autowired
 	private ApplicationContext applicationContext;
-	
+
 	@Autowired
 	private ApplicationMemory memorijaAplikacije;
 
 	/** pristup ApplicationContext */
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-	    this.applicationContext = applicationContext;  
+		this.applicationContext = applicationContext;
 	}
-	
+
 	/** inicijalizacija podataka za kontroler */
 	@SuppressWarnings("unchecked")
 	@PostConstruct
-	public void init() {	
-		bURL = servletContext.getContextPath()+"/";
+	public void init() {
+		bURL = servletContext.getContextPath() + "/";
 		memorijaAplikacije = applicationContext.getBean(ApplicationMemory.class);
-	    Knjige knjige = new Knjige(); 
-	    
-		
+		Knjige knjige = new Knjige();
+
 //		servletContext.setAttribute(KnjigeController.KNJIGE_KEY, knjige);	
-		
+
 		memorijaAplikacije.put(KnjigeController.KNJIGE_KEY, knjige);
 	}
-	
-	/** pribavnjanje HTML stanice za prikaz svih entiteta, get zahtev 
-	 * @throws IOException */
+
+	/**
+	 * pribavnjanje HTML stanice za prikaz svih entiteta, get zahtev
+	 * 
+	 * @throws IOException
+	 */
 	// GET: knjige
 	@GetMapping
 	@ResponseBody
 	public void index(HttpServletResponse response) throws IOException {
 		PrintWriter out = response.getWriter();
-		
+
 		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
-		
+
 		File htmlFile = new ClassPathResource("static/template.html").getFile();
 		Document document = Jsoup.parse(htmlFile, "UTF-8");
-		
+
 		Element body = document.select("body").first();
-		
+
 		Element tableNode = new Element(Tag.valueOf("table"), "");
 		Element caption = new Element(Tag.valueOf("caption"), "");
 		Element thRow = new Element(Tag.valueOf("tr"), "");
@@ -92,17 +94,19 @@ public class KnjigeController implements ApplicationContextAware {
 		Element thLang = new Element(Tag.valueOf("th"), "").text("Laungauge");
 		Element thPages = new Element(Tag.valueOf("th"), "").text("Pages");
 		Element thDetalji = new Element(Tag.valueOf("th"), "").text("Detalji");
-		
+		Element thObrisi = new Element(Tag.valueOf("th"), "").text("Brisanje");
+
 		thRow.appendChild(thId);
 		thRow.appendChild(thName);
 		thRow.appendChild(thRegNo);
 		thRow.appendChild(thLang);
 		thRow.appendChild(thPages);
 		thRow.appendChild(thDetalji);
-		
+		thRow.appendChild(thObrisi);
+
 		tableNode.appendChild(caption);
 		tableNode.appendChild(thRow);
-		
+
 		for (Knjiga knjiga : knjige.findAll()) {
 			Element rowElement = new Element(Tag.valueOf("tr"), "");
 			Element tdIdElement = new Element(Tag.valueOf("td"), "").text(knjiga.getId().toString());
@@ -111,102 +115,103 @@ public class KnjigeController implements ApplicationContextAware {
 			Element tdLaungauge = new Element(Tag.valueOf("td"), "").text(knjiga.getJezik());
 			Element tdPages = new Element(Tag.valueOf("td"), "").text(String.valueOf(knjiga.getBrojStranica()));
 			Element tdButton = new Element(Tag.valueOf("td"), "");
-			Element Href = new Element(Tag.valueOf("a"), "").attr("href", bURL + "knjige/details?id=" + knjiga.getId()).text("Detalji");
+			Element Href = new Element(Tag.valueOf("a"), "").attr("href", bURL + "knjige/details?id=" + knjiga.getId())
+					.text("Detalji");
 			tdButton.appendChild(Href);
-			
+			Element tdObrisi = new Element(Tag.valueOf("td"), "");
+			Element hrefObrisi = new Element(Tag.valueOf("form"), "")
+					.attr("action", bURL + "knjige/delete?id=" + knjiga.getId()).attr("method", "post");
+			Element btnObrisi = new Element(Tag.valueOf("button"), "").attr("type", "submit").text("Obrisi");
+			hrefObrisi.appendChild(btnObrisi);
+			tdObrisi.appendChild(hrefObrisi);
+
 			rowElement.appendChild(tdIdElement);
 			rowElement.appendChild(tdName);
 			rowElement.appendChild(tdRegNo);
 			rowElement.appendChild(tdLaungauge);
 			rowElement.appendChild(tdPages);
 			rowElement.appendChild(tdButton);
-			
+			rowElement.appendChild(tdObrisi);
+
 			tableNode.appendChild(rowElement);
 		}
 		body.appendChild(tableNode);
 		Element Href = new Element(Tag.valueOf("a"), "").attr("href", bURL).text("Pocetna");
 		body.appendChild(Href);
 		out.write(document.html());
-		
+
 		return;
 	}
-	
+
 	/** pribavnjanje HTML stanice za unos novog entiteta, get zahtev */
 	// GET: knjige/dodaj
-	@GetMapping(value="/add")
+	@GetMapping(value = "/add")
 	public String create() {
 		return "/dodaj-knjigu.html";
 	}
-	
+
 	/** obrada podataka forme za unos novog entiteta, post zahtev */
 	// POST: knjige/add
 	@PostMapping(value = "/add")
 	@ResponseBody
-	public void create(@RequestParam String naziv, @RequestParam String registarskiBrojPrimerka, 
-			@RequestParam String jezik, @RequestParam int brojStranica, HttpServletResponse response) throws IOException {	
+	public void create(@RequestParam String naziv, @RequestParam String registarskiBrojPrimerka,
+			@RequestParam String jezik, @RequestParam int brojStranica, HttpServletResponse response)
+			throws IOException {
 		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
 		knjige.save(new Knjiga(null, naziv, registarskiBrojPrimerka, jezik, brojStranica));
 		response.sendRedirect(bURL + "knjige");
 		return;
-	
+
 	}
-	
+
 	/** obrada podataka forme za izmenu postojećeg entiteta, post zahtev */
 	// POST: knjige/edit
-	@PostMapping(value="/edit")
-	public void edit(@ModelAttribute Knjiga knjigaEdited , HttpServletResponse response) throws IOException {
+	@PostMapping(value = "/edit")
+	public void edit(@ModelAttribute Knjiga knjigaEdited, HttpServletResponse response) throws IOException {
 		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
 		Knjiga knjigaOriginal = knjige.findOne(knjigaEdited.getId());
-		
+
 		knjigaOriginal.setNaziv(knjigaEdited.getNaziv());
 		knjigaOriginal.setRegistarskiBrojPrimerka(knjigaEdited.getRegistarskiBrojPrimerka());
 		knjigaOriginal.setJezik(knjigaEdited.getJezik());
 		knjigaOriginal.setBrojStranica(knjigaEdited.getBrojStranica());
-		
+
 		response.sendRedirect(bURL + "knjige");
 		return;
 	}
-	
+
 	/** obrada podataka forme za za brisanje postojećeg entiteta, post zahtev */
 	// POST: knjige/delete
-	@PostMapping(value="/delete")
+	@PostMapping(value = "/delete")
 	public void delete(@RequestParam Long id, HttpServletResponse response) throws IOException {
 		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
 		knjige.delete(id);
-		response.sendRedirect(bURL + "knjige");		
+		response.sendRedirect(bURL + "knjige");
 	}
-	
+
 	/** pribavnjanje HTML stanice za prikaz određenog entiteta , get zahtev */
 	// GET: knjige/details?id=1
-	@GetMapping(value="/details")
+	@GetMapping(value = "/details")
 	@ResponseBody
 	public String details(@RequestParam Long id) {
 		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
 		Knjiga knjiga = knjige.findOne(id);
-		
-		return "<!DOCTYPE html>\r\n"
-				+ "<html>\r\n"
-				+ "<head>\r\n"
-				+ "<meta charset=\"UTF-8\">\r\n"
-				+ "<title>Prikaz detalja, izmena i brisanje knjige</title>\r\n"
-				+ "</head>\r\n"
-				+ "<body>\r\n"
-				+ "	<form action=\"/PrviMavenVebProjekat/knjige/edit?id="+knjiga.getId()+"\" method=\"post\">\r\n"
+
+		return "<!DOCTYPE html>\r\n" + "<html>\r\n" + "<head>\r\n" + "<meta charset=\"UTF-8\">\r\n"
+				+ "<title>Prikaz detalja, izmena i brisanje knjige</title>\r\n" + "</head>\r\n" + "<body>\r\n"
+				+ "	<form action=\"/PrviMavenVebProjekat/knjige/edit?id=" + knjiga.getId() + "\" method=\"post\">\r\n"
 				+ "		<label for=\"naziv\">Naziv: </label>\r\n"
-				+ "		<input type = \"text\" name= \"naziv\" value=\""+knjiga.getNaziv()+"\" /> <br>\r\n"
+				+ "		<input type = \"text\" name= \"naziv\" value=\"" + knjiga.getNaziv() + "\" /> <br>\r\n"
 				+ "		<label for=\"registarskiBrojPrimerka\">registarskiBrojPrimerka: </label>\r\n"
-				+ "		<input type = \"text\" name= \"registarskiBrojPrimerka\" value=\""+knjiga.getRegistarskiBrojPrimerka()+"\" /> <br>\r\n"
+				+ "		<input type = \"text\" name= \"registarskiBrojPrimerka\" value=\""
+				+ knjiga.getRegistarskiBrojPrimerka() + "\" /> <br>\r\n"
 				+ "		<label for=\"jezik\">Jezik: </label>\r\n"
-				+ "		<input type = \"text\" name= \"jezik\" value=\""+knjiga.getJezik()+"\" /> <br>\r\n"
+				+ "		<input type = \"text\" name= \"jezik\" value=\"" + knjiga.getJezik() + "\" /> <br>\r\n"
 				+ "		<label for=\"brojStranica\">Broj Stranica: </label>\r\n"
-				+ "		<input type = \"number\" name= \"brojStranica\" value=\""+knjiga.getBrojStranica()+"\" /> <br>\r\n"
-				+ "		<input type = \"submit\" value = \"Potvrdi\"/>\r\n"
-				+ "	</form>\r\n"
-				+ "	<form action=\"/PrviMavenVebProjekat/knjige/delete?id="+knjiga.getId()+"\" method=\"post\">\r\n"
-				+ "\r\n"
-				+ "		<input type = \"submit\" value = \"Obrisi ovu knjigu\"/>\r\n"
-				+ "	</form>"
-				+ "</body>\r\n"
-				+ "</html>";
+				+ "		<input type = \"number\" name= \"brojStranica\" value=\"" + knjiga.getBrojStranica()
+				+ "\" /> <br>\r\n" + "		<input type = \"submit\" value = \"Potvrdi\"/>\r\n" + "	</form>\r\n"
+				+ "	<form action=\"/PrviMavenVebProjekat/knjige/delete?id=" + knjiga.getId() + "\" method=\"post\">\r\n"
+				+ "\r\n" + "		<input type = \"submit\" value = \"Obrisi ovu knjigu\"/>\r\n" + "	</form>"
+				+ "</body>\r\n" + "</html>";
 	}
 }
