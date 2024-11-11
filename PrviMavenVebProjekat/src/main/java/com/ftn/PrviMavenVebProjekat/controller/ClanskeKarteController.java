@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.ftn.PrviMavenVebProjekat.bean.SecondConfiguration.ApplicationMemory;
+import com.ftn.PrviMavenVebProjekat.model.ClanskaKarta;
 import com.ftn.PrviMavenVebProjekat.model.ClanskeKarte;
 import com.ftn.PrviMavenVebProjekat.model.Knjige;
 
@@ -51,19 +52,37 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	@GetMapping
 	@ResponseBody
 	public String sveknjige(){
-		return "<!DOCTYPE html>\r\n"
+		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+		
+		String retHTML = "<!DOCTYPE html>\r\n"
 				+ "<html lang=\"en\">\r\n"
 				+ "<head>\r\n"
 				+ "    <meta charset=\"UTF-8\">\r\n"
 				+ "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
 				+ "    <title>Prikaz svih clanskih karata</title>\r\n"
+				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"/PrviMavenVebProjekat/css/StiloviTabela.css\"/>\r\n"
+				+ "<link rel=\"stylesheet\" type=\"text/css\" href=\"/PrviMavenVebProjekat/css/StiloviHorizontalniMeni.css\"/>"
 				+ "</head>\r\n"
 				+ "<body>\r\n"
-				+ "   <h1>Registarski broj: </h1>\r\n"
-				+ "   <p></p>\r\n"
-				+ "   <h1>Iznajmljene knjige: </h1>\r\n"
+				+ "<table>"
+				+"<tr>"
+				+ "<th>Registarski Broj</th>"
+				+ "<th>ID</th>"
+				+ "</tr>";
+		
+//				+ "   <h1>Iznajmljene knjige: </h1>\r\n";
+		
+		for(ClanskaKarta clanskaKarta : clanskekarte.findAll()) {
+			retHTML += "<tr>"
+					+ "<td>" + clanskaKarta.getRegistarskiBroj() + "</td>"
+					+ "<td>" + clanskaKarta.getId() + "</td>"   // ID ne bi trebao da se prikazuje korisniku, ovo je samo u demostrativne svrhe
+					+ "</tr>";
+		}
+		
+		retHTML += "</table>"
 				+ "</body>\r\n"
 				+ "</html>";
+		return retHTML;
 	}
 
 }
