@@ -6,15 +6,17 @@ public class ClanskaKarta {
 
 	private Long id;
 	private String registarskiBroj;
+	private Korisnik korisnik;
 	private List<Knjiga> iznajmljenjeKnjige;
 
 	public ClanskaKarta() {
 	}
 
-	public ClanskaKarta(Long id, String registarskiBroj, List<Knjiga> iznajmljenjeKnjige) {
+	public ClanskaKarta(Long id, String registarskiBroj, Korisnik korisnik, List<Knjiga> iznajmljenjeKnjige) {
 		super();
 		this.id = id;
 		this.registarskiBroj = registarskiBroj;
+		this.korisnik = korisnik;
 		this.iznajmljenjeKnjige = iznajmljenjeKnjige;
 	}
 
@@ -41,6 +43,15 @@ public class ClanskaKarta {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+	public Korisnik getKorisnik() {
+		return korisnik;
+	}
+
+	public void setKorisnik(Korisnik korisnik) {
+		this.korisnik = korisnik;
+	}
+	
 	
 	
 }

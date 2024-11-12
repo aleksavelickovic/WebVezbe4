@@ -9,19 +9,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ClanskeKarte {
-	private Map<Long, ClanskaKarta> clanskekarte = new HashMap<>();
+public class Korisnici {
+	private Map<Long, Korisnik> korisnici = new HashMap<>();
 	private long nextId = 1L;
+	private static Korisnici instance;
 
 	/** Cita knjige iz datoteke i smesta ih u asocijativnu listu knjiga. 
 	 * 
 	 *  TODO parsirati trazeni fajl na nacin kako je to zapoceto, kreirati objekte klase Knjiga i sacuvati ih u kolekciji
 	 * */
-	public ClanskeKarte() {
-		Korisnici korisnici = Korisnici.getInstance();
+	private Korisnici() {
 
 		try {
-			Path path = Paths.get(getClass().getClassLoader().getResource("clanskekarte.txt").toURI());
+			Path path = Paths.get(getClass().getClassLoader().getResource("korisnici.txt").toURI());
 			System.out.println(path.toFile().getAbsolutePath());
 			List<String> lines = Files.readAllLines(path, Charset.forName("UTF-8"));
 
@@ -32,9 +32,10 @@ public class ClanskeKarte {
 				
 				String[] tokens = line.split(";");
 				Long id = Long.parseLong(tokens[0]);
-				String regBroj = tokens[1];
-				Long idKorisnika = Long.parseLong(tokens[2]);
-				clanskekarte.put(id, new ClanskaKarta(id, regBroj, korisnici.findOne(idKorisnika), new ArrayList<Knjiga>()));			
+				String ime = tokens[1];
+				String prezime = tokens[2];
+				String email = tokens[3];
+				korisnici.put(id, new Korisnik(id, ime, prezime, email));			
 				
 				if(nextId<id)
 					nextId=id;
@@ -45,8 +46,18 @@ public class ClanskeKarte {
 		}
 	}
 	
-	public List<ClanskaKarta> findAll() {
-		return new ArrayList<ClanskaKarta>(clanskekarte.values());
+	public static Korisnici getInstance() {
+		 if (instance == null) {
+	            instance = new Korisnici();
+	        }
+	        return instance;
 	}
 	
+	public Korisnik findOne(Long id) {
+		return korisnici.get(id);
+	}
+	
+	public List<Korisnik> findAll() {
+		return new ArrayList<Korisnik>(korisnici.values());
+	}
 }

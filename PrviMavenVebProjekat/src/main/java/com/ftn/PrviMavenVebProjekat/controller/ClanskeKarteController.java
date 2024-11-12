@@ -18,6 +18,7 @@ import com.ftn.PrviMavenVebProjekat.bean.SecondConfiguration.ApplicationMemory;
 import com.ftn.PrviMavenVebProjekat.model.ClanskaKarta;
 import com.ftn.PrviMavenVebProjekat.model.ClanskeKarte;
 import com.ftn.PrviMavenVebProjekat.model.Knjige;
+import com.ftn.PrviMavenVebProjekat.model.Korisnici;
 
 @Controller
 @RequestMapping(value = "/clanskekarte")
@@ -45,6 +46,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		bURL = servletContext.getContextPath() + "/";
 		memorijaAplikacije = applicationContext.getBean(ApplicationMemory.class);
 		ClanskeKarte clanskekarte = new ClanskeKarte();
+		Korisnici korisnici = Korisnici.getInstance();
 
 		memorijaAplikacije.put(ClanskeKarteController.CKARTE_KEY, clanskekarte);
 
@@ -67,7 +69,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 				+ "<table>"
 				+"<tr>"
 				+ "<th>Registarski Broj</th>"
-				+ "<th>ID</th>"
+				+ "<th>Korisnik</th>"
 				+ "</tr>";
 		
 //				+ "   <h1>Iznajmljene knjige: </h1>\r\n";
@@ -75,7 +77,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		for(ClanskaKarta clanskaKarta : clanskekarte.findAll()) {
 			retHTML += "<tr>"
 					+ "<td>" + clanskaKarta.getRegistarskiBroj() + "</td>"
-					+ "<td>" + clanskaKarta.getId() + "</td>"   // ID ne bi trebao da se prikazuje korisniku, ovo je samo u demostrativne svrhe
+					+ "<td>" + clanskaKarta.getKorisnik().getIme() + " " + clanskaKarta.getKorisnik().getPrezime() + "</td>"
 					+ "</tr>";
 		}
 		
