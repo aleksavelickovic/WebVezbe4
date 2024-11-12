@@ -49,4 +49,13 @@ public class ClanskeKarte {
 		return new ArrayList<ClanskaKarta>(clanskekarte.values());
 	}
 	
+	
+	public ClanskaKarta save(ClanskaKarta clanskakarta) {
+		if (clanskakarta.getId() == null) {
+			clanskakarta.setId(++nextId);
+		}
+		clanskekarte.put(clanskakarta.getId(), clanskakarta);
+		return clanskakarta;
+	}
+	
 }
