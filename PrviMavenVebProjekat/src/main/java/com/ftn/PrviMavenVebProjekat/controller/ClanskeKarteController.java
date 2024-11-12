@@ -85,7 +85,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		for(ClanskaKarta clanskaKarta : clanskekarte.findAll()) {
 			retHTML += "<tr>"
 					+ "<td>" + clanskaKarta.getRegistarskiBroj() + "</td>"
-					+ "<td>" + clanskaKarta.getKorisnik().getIme() + " " + clanskaKarta.getKorisnik().getPrezime() + "</td>"
+					+ "<td>" + clanskaKarta.getKorisnik().getIme() + " " + clanskaKarta.getKorisnik().getPrezime() + " /email:  "+ clanskaKarta.getKorisnik().getEmail() +  "</td>"
 					+ "</tr>";
 		}
 		
