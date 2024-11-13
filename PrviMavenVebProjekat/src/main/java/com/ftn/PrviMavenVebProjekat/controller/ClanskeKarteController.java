@@ -63,7 +63,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	}
 	@GetMapping
 	@ResponseBody
-	public String sveknjige(){
+	public String sveclanskekarte(){
 		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
 		
 		String retHTML = "<!DOCTYPE html>\r\n"
@@ -94,7 +94,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 			        retHTML += "<td>"+knjiga.getNaziv()+"</td>";
 			    }
 			} else {
-			    retHTML += "<td>Nema iznajmljenih knjiga</td>";
+			    retHTML += "<td>Nema iznajmljenih knjiga!</td>";
 			}
 					
 			retHTML	+= "<td><a href = " + bURL + "clanskekarte/details?id="+clanskaKarta.getId()+">Detalji</a></td>"
