@@ -216,7 +216,7 @@ public class KnjigeController implements ApplicationContextAware {
 				+ "\r\n" + "		<input type = \"submit\" value = \"Obrisi ovu knjigu\"/>\r\n" + "	</form>";
 
 		if (knjiga.isIzdata() == false) {
-			retHTML += "<a href="+ bURL+ "clanskekarte/zaduzivanje?idknjige="+knjiga.getId()+">Zaduzi ovu knjigu</a>";
+			retHTML += "<a href="+ bURL+ "clanskekarte/zaduzi?idknjige="+knjiga.getId()+">Zaduzi ovu knjigu</a>";
 		}
 		else {
 			retHTML += "<h3>Ova knjiga je izdata!!!</h3>";

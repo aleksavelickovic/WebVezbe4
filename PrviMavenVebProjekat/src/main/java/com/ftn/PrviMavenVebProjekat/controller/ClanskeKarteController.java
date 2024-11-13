@@ -3,6 +3,8 @@ package com.ftn.PrviMavenVebProjekat.controller;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
@@ -34,6 +36,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	
 	public static final String CKARTE_KEY = "clanskekarte";
 	
+	
 
 	@Autowired
 	private ServletContext servletContext;
@@ -59,6 +62,9 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		Korisnici korisnici = Korisnici.getInstance();
 
 		memorijaAplikacije.put(ClanskeKarteController.CKARTE_KEY, clanskekarte);
+		
+		ArrayList<Knjiga> knjigeUKorpi = new ArrayList<Knjiga>();
+		memorijaAplikacije.put("knjigeukorpi", knjigeUKorpi);
 
 	}
 	@GetMapping
@@ -170,14 +176,29 @@ public class ClanskeKarteController implements ApplicationContextAware {
 			
 		}
 	
-	@PostMapping(value = "/zaduzi")
-	public void zaduzi(@RequestParam Long id, @RequestParam Long idknjige, HttpServletResponse response) throws IOException {
+	@GetMapping(value = "/zaduzi")
+	public void zaduzi(@RequestParam Long idknjige, HttpServletResponse response) throws IOException {
 		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
 		Knjige knjige = Knjige.getInstance();
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) memorijaAplikacije.get("knjigeukorpi");
 		
-		clanskekarte.findOne(id).getIznajmljenjeKnjige().add(knjige.findOne(idknjige));
+//		clanskekarte.findOne(id).getIznajmljenjeKnjige().add(knjige.findOne(idknjige));
 		knjige.findOne(idknjige).setIzdata(true);
 		
+		knjigeUKorpi.add(knjige.findOne(idknjige));
+		response.sendRedirect(bURL + "clanskekarte");
+	}
+	
+	@GetMapping(value = "/zaduzisveknjige")
+	public void zaduzisve(@RequestParam Long id, HttpServletResponse response) throws IOException {
+		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+		Knjige knjige = Knjige.getInstance();
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) memorijaAplikacije.get("knjigeukorpi");
+		
+		for (Knjiga knjiga : knjigeUKorpi) {
+			clanskekarte.findOne(id).getIznajmljenjeKnjige().add(knjiga);
+			knjiga.setIzdata(true);
+		}
 		response.sendRedirect(bURL + "clanskekarte");
 	}
 	
@@ -207,6 +228,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		} else {
 		    retHTML += "<p>Nema iznajmljenih knjiga na ovu clansku kartu!</p>";
 		}
+		retHTML += "<a href="+bURL+"clanskekarte/zaduzisveknjige?id="+clanskaKarta.getId()+">Zaduzi sve knjige na ovu clansku kartu</a>";
 		retHTML += "<br><br>"
 				+ "<a href="+bURL+">Pocetna</a>"
 				+ "</body>";
