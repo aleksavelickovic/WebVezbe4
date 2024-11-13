@@ -13,12 +13,13 @@ public class Knjige {
 
 	private Map<Long, Knjiga> knjige = new HashMap<>();
 	private long nextId = 1L;
+	public static Knjige instance;
 
 	/** Cita knjige iz datoteke i smesta ih u asocijativnu listu knjiga. 
 	 * 
 	 *  TODO parsirati trazeni fajl na nacin kako je to zapoceto, kreirati objekte klase Knjiga i sacuvati ih u kolekciji
 	 * */
-	public Knjige() {
+	private Knjige() {
 
 		try {
 			Path path = Paths.get(getClass().getClassLoader().getResource("knjige.txt").toURI());
@@ -46,6 +47,12 @@ public class Knjige {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public static Knjige getInstance() {
+		 if (instance == null) {
+	            instance = new Knjige();
+	        }
+	        return instance;
 	}
 
 	/** vraca knjigu u odnosu na zadati id */
@@ -123,4 +130,7 @@ public class Knjige {
 
 		return ret;
 	}
+
+
+	
 }

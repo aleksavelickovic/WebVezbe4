@@ -45,10 +45,13 @@ public class ClanskeKarte {
 		}
 	}
 	
+	public ClanskaKarta findOne(Long id) {
+		return clanskekarte.get(id);
+	}
+	
 	public List<ClanskaKarta> findAll() {
 		return new ArrayList<ClanskaKarta>(clanskekarte.values());
 	}
-	
 	
 	public ClanskaKarta save(ClanskaKarta clanskakarta) {
 		if (clanskakarta.getId() == null) {
@@ -57,5 +60,7 @@ public class ClanskeKarte {
 		clanskekarte.put(clanskakarta.getId(), clanskakarta);
 		return clanskakarta;
 	}
+	
+
 	
 }

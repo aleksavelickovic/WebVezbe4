@@ -60,7 +60,7 @@ public class KnjigeController implements ApplicationContextAware {
 	public void init() {
 		bURL = servletContext.getContextPath() + "/";
 		memorijaAplikacije = applicationContext.getBean(ApplicationMemory.class);
-		Knjige knjige = new Knjige();
+		Knjige knjige = Knjige.getInstance();
 
 //		servletContext.setAttribute(KnjigeController.KNJIGE_KEY, knjige);	
 
@@ -108,32 +108,34 @@ public class KnjigeController implements ApplicationContextAware {
 		tableNode.appendChild(thRow);
 
 		for (Knjiga knjiga : knjige.findAll()) {
-			Element rowElement = new Element(Tag.valueOf("tr"), "");
-			Element tdIdElement = new Element(Tag.valueOf("td"), "").text(knjiga.getId().toString());
-			Element tdName = new Element(Tag.valueOf("td"), "").text(knjiga.getNaziv());
-			Element tdRegNo = new Element(Tag.valueOf("td"), "").text(knjiga.getRegistarskiBrojPrimerka());
-			Element tdLaungauge = new Element(Tag.valueOf("td"), "").text(knjiga.getJezik());
-			Element tdPages = new Element(Tag.valueOf("td"), "").text(String.valueOf(knjiga.getBrojStranica()));
-			Element tdButton = new Element(Tag.valueOf("td"), "");
-			Element Href = new Element(Tag.valueOf("a"), "").attr("href", bURL + "knjige/details?id=" + knjiga.getId())
-					.text("Detalji");
-			tdButton.appendChild(Href);
-			Element tdObrisi = new Element(Tag.valueOf("td"), "");
-			Element hrefObrisi = new Element(Tag.valueOf("form"), "")
-					.attr("action", bURL + "knjige/delete?id=" + knjiga.getId()).attr("method", "post");
-			Element btnObrisi = new Element(Tag.valueOf("button"), "").attr("type", "submit").text("Obrisi");
-			hrefObrisi.appendChild(btnObrisi);
-			tdObrisi.appendChild(hrefObrisi);
+			if (knjiga.isIzdata() == false) {
+				Element rowElement = new Element(Tag.valueOf("tr"), "");
+				Element tdIdElement = new Element(Tag.valueOf("td"), "").text(knjiga.getId().toString());
+				Element tdName = new Element(Tag.valueOf("td"), "").text(knjiga.getNaziv());
+				Element tdRegNo = new Element(Tag.valueOf("td"), "").text(knjiga.getRegistarskiBrojPrimerka());
+				Element tdLaungauge = new Element(Tag.valueOf("td"), "").text(knjiga.getJezik());
+				Element tdPages = new Element(Tag.valueOf("td"), "").text(String.valueOf(knjiga.getBrojStranica()));
+				Element tdButton = new Element(Tag.valueOf("td"), "");
+				Element Href = new Element(Tag.valueOf("a"), "").attr("href", bURL + "knjige/details?id=" + knjiga.getId())
+						.text("Detalji");
+				tdButton.appendChild(Href);
+				Element tdObrisi = new Element(Tag.valueOf("td"), "");
+				Element hrefObrisi = new Element(Tag.valueOf("form"), "")
+						.attr("action", bURL + "knjige/delete?id=" + knjiga.getId()).attr("method", "post");
+				Element btnObrisi = new Element(Tag.valueOf("button"), "").attr("type", "submit").text("Obrisi");
+				hrefObrisi.appendChild(btnObrisi);
+				tdObrisi.appendChild(hrefObrisi);
 
-			rowElement.appendChild(tdIdElement);
-			rowElement.appendChild(tdName);
-			rowElement.appendChild(tdRegNo);
-			rowElement.appendChild(tdLaungauge);
-			rowElement.appendChild(tdPages);
-			rowElement.appendChild(tdButton);
-			rowElement.appendChild(tdObrisi);
+				rowElement.appendChild(tdIdElement);
+				rowElement.appendChild(tdName);
+				rowElement.appendChild(tdRegNo);
+				rowElement.appendChild(tdLaungauge);
+				rowElement.appendChild(tdPages);
+				rowElement.appendChild(tdButton);
+				rowElement.appendChild(tdObrisi);
 
-			tableNode.appendChild(rowElement);
+				tableNode.appendChild(rowElement);
+			}
 		}
 		body.appendChild(tableNode);
 		Element Href = new Element(Tag.valueOf("a"), "").attr("href", bURL).text("Pocetna");
@@ -197,7 +199,7 @@ public class KnjigeController implements ApplicationContextAware {
 		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
 		Knjiga knjiga = knjige.findOne(id);
 
-		return "<!DOCTYPE html>\r\n" + "<html>\r\n" + "<head>\r\n" + "<meta charset=\"UTF-8\">\r\n"
+		String retHTML = "<!DOCTYPE html>\r\n" + "<html>\r\n" + "<head>\r\n" + "<meta charset=\"UTF-8\">\r\n"
 				+ "<title>Prikaz detalja, izmena i brisanje knjige</title>\r\n" + "</head>\r\n" + "<body>\r\n"
 				+ "	<form action=\"/PrviMavenVebProjekat/knjige/edit?id=" + knjiga.getId() + "\" method=\"post\">\r\n"
 				+ "		<label for=\"naziv\">Naziv: </label>\r\n"
@@ -211,7 +213,15 @@ public class KnjigeController implements ApplicationContextAware {
 				+ "		<input type = \"number\" name= \"brojStranica\" value=\"" + knjiga.getBrojStranica()
 				+ "\" /> <br>\r\n" + "		<input type = \"submit\" value = \"Potvrdi\"/>\r\n" + "	</form>\r\n"
 				+ "	<form action=\"/PrviMavenVebProjekat/knjige/delete?id=" + knjiga.getId() + "\" method=\"post\">\r\n"
-				+ "\r\n" + "		<input type = \"submit\" value = \"Obrisi ovu knjigu\"/>\r\n" + "	</form>"
-				+ "</body>\r\n" + "</html>";
+				+ "\r\n" + "		<input type = \"submit\" value = \"Obrisi ovu knjigu\"/>\r\n" + "	</form>";
+
+		if (knjiga.isIzdata() == false) {
+			retHTML += "<a href="+ bURL+ "clanskekarte/zaduzivanje?idknjige="+knjiga.getId()+">Zaduzi ovu knjigu</a>";
+		}
+		else {
+			retHTML += "<h3>Ova knjiga je izdata!!!</h3>";
+		}
+		retHTML += "</body>\r\n" + "</html>";
+		return retHTML;
 	}
 }

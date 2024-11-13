@@ -49,6 +49,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		this.applicationContext = applicationContext;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@PostConstruct
 	public void init() {
 		bURL = servletContext.getContextPath() + "/";
@@ -78,15 +79,23 @@ public class ClanskeKarteController implements ApplicationContextAware {
 				+"<tr>"
 				+ "<th>Registarski Broj</th>"
 				+ "<th>Korisnik</th>"
+				+ "<th>Iznajmljene knjige: </th>"
 				+ "</tr>";
 		
-//				+ "   <h1>Iznajmljene knjige: </h1>\r\n";
 		
 		for(ClanskaKarta clanskaKarta : clanskekarte.findAll()) {
 			retHTML += "<tr>"
 					+ "<td>" + clanskaKarta.getRegistarskiBroj() + "</td>"
-					+ "<td>" + clanskaKarta.getKorisnik().getIme() + " " + clanskaKarta.getKorisnik().getPrezime() + " /email:  "+ clanskaKarta.getKorisnik().getEmail() +  "</td>"
-					+ "</tr>";
+					+ "<td>" + clanskaKarta.getKorisnik().getIme() + " " + clanskaKarta.getKorisnik().getPrezime() + " /email:  "+ clanskaKarta.getKorisnik().getEmail() +  "</td>";
+					for (Knjiga knjiga : clanskaKarta.getIznajmljenjeKnjige()) {
+						if(clanskaKarta.getIznajmljenjeKnjige().size() != 0) {
+							retHTML += "<td>"+knjiga.getNaziv()+"</td>";
+						}
+						else {
+							retHTML += "<td>Nema iznajmljenih knjiga</td>";
+						}
+					};
+			retHTML	+= "</tr>";
 		}
 		
 		retHTML += "</table>"
@@ -135,5 +144,38 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		return;
 
 	}
-
+	
+	@GetMapping(value = "/zaduzivanje")
+	@ResponseBody
+		public String zaduzivanje(@RequestParam Long idknjige){
+		String retHTMl = "<!DOCTYPE html>\r\n"
+				+ "<html>\r\n"
+				+ "<head>\r\n"
+				+ "<meta charset=\"UTF-8\">\r\n"
+				+ "<title>DODAJ KNJIGU</title>\r\n"
+				+ "</head>\r\n"
+				+ "<body>\r\n"
+				+ "	<form action=\"" + bURL + "clanskekarte/zaduzi\" method=\"post\">\r\n"
+				+ "		<label for=\"naziv\">ID clankse karte: </label>\r\n"
+				+ "		<input type = \"number\" name= \"id\" /> <br>\r\n"
+				+ "		<input type = \"hidden\" name= \"idknjige\" value=\""+idknjige+"\" /> <br>\r\n"
+						+ "<input type = \"submit\">Potrvrdi</input>"
+				+ "	</form>\r\n"
+				+ "</body>\r\n"
+				+ "</html>";
+		return retHTMl;
+			
+		}
+	
+	@PostMapping(value = "/zaduzi")
+	public void zaduzi(@RequestParam Long id, @RequestParam Long idknjige, HttpServletResponse response) throws IOException {
+		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+		Knjige knjige = Knjige.getInstance();
+		
+		clanskekarte.findOne(id).getIznajmljenjeKnjige().add(knjige.findOne(idknjige));
+		knjige.findOne(idknjige).setIzdata(true);
+		
+		response.sendRedirect(bURL + "clanskekarte");
+	}
+	
 }
