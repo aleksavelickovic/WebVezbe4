@@ -12,12 +12,13 @@ import java.util.Map;
 public class ClanskeKarte {
 	private Map<Long, ClanskaKarta> clanskekarte = new HashMap<>();
 	private long nextId = 1L;
+	private static ClanskeKarte instance;
 
 	/** Cita knjige iz datoteke i smesta ih u asocijativnu listu knjiga. 
 	 * 
 	 *  TODO parsirati trazeni fajl na nacin kako je to zapoceto, kreirati objekte klase Knjiga i sacuvati ih u kolekciji
 	 * */
-	public ClanskeKarte() {
+	private ClanskeKarte() {
 		Korisnici korisnici = Korisnici.getInstance();
 
 		try {
@@ -43,6 +44,13 @@ public class ClanskeKarte {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static ClanskeKarte getInstance() {
+		if (instance == null) {
+            instance = new ClanskeKarte();
+        }
+        return instance;
 	}
 	
 	public ClanskaKarta findOne(Long id) {

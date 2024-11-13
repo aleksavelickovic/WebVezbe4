@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.BeansException;
@@ -54,7 +55,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	public void init() {
 		bURL = servletContext.getContextPath() + "/";
 		memorijaAplikacije = applicationContext.getBean(ApplicationMemory.class);
-		ClanskeKarte clanskekarte = new ClanskeKarte();
+		ClanskeKarte clanskekarte = ClanskeKarte.getInstance();
 		Korisnici korisnici = Korisnici.getInstance();
 
 		memorijaAplikacije.put(ClanskeKarteController.CKARTE_KEY, clanskekarte);
@@ -200,13 +201,29 @@ public class ClanskeKarteController implements ApplicationContextAware {
 				+ "   <h1>Iznajmljene knjige: </h1>\r\n";
 		if (clanskaKarta.getIznajmljenjeKnjige().size() != 0) {
 		    for (Knjiga knjiga : clanskaKarta.getIznajmljenjeKnjige()) {
-		        retHTML += "<p>" + knjiga.getNaziv() + "</p>";
+		        retHTML += "<p>" + knjiga.getNaziv() + "</p>"
+		        		+ "<a href="+bURL+"clanskekarte/razduzivanje?id="+knjiga.getId()+"&idkarte="+clanskaKarta.getId()+">Razduzi ovu knjigu</a>";
 		    }
 		} else {
 		    retHTML += "<p>Nema iznajmljenih knjiga na ovu clansku kartu!</p>";
 		}
-		retHTML += "</body>";
+		retHTML += "<br><br>"
+				+ "<a href="+bURL+">Pocetna</a>"
+				+ "</body>";
 		return retHTML;
+	}
+	
+	@GetMapping(value = "/razduzivanje")
+	public void razduziKnjigu(@RequestParam Long id,@RequestParam Long idkarte , HttpServletResponse response, HttpServletRequest request) throws IOException {
+		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+		ClanskaKarta clanskaKarta = clanskekarte.findOne(idkarte);
+		Knjige knjige = Knjige.getInstance();
+		
+		clanskaKarta.getIznajmljenjeKnjige().remove(knjige.findOne(id));
+		knjige.findOne(id).setIzdata(false);
+		
+		response.sendRedirect(bURL + "clanskekarte/details?id=" + idkarte);
+		return;
 	}
 	
 }
