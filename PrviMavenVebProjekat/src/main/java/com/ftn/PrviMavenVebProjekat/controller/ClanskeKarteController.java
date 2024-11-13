@@ -80,6 +80,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 				+ "<th>Registarski Broj</th>"
 				+ "<th>Korisnik</th>"
 				+ "<th>Iznajmljene knjige: </th>"
+				+ "<th>Prikaz detalja: </th>"
 				+ "</tr>";
 		
 		
@@ -87,15 +88,16 @@ public class ClanskeKarteController implements ApplicationContextAware {
 			retHTML += "<tr>"
 					+ "<td>" + clanskaKarta.getRegistarskiBroj() + "</td>"
 					+ "<td>" + clanskaKarta.getKorisnik().getIme() + " " + clanskaKarta.getKorisnik().getPrezime() + " /email:  "+ clanskaKarta.getKorisnik().getEmail() +  "</td>";
-					for (Knjiga knjiga : clanskaKarta.getIznajmljenjeKnjige()) {
-						if(clanskaKarta.getIznajmljenjeKnjige().size() != 0) {
-							retHTML += "<td>"+knjiga.getNaziv()+"</td>";
-						}
-						else {
-							retHTML += "<td>Nema iznajmljenih knjiga</td>";
-						}
-					};
-			retHTML	+= "</tr>";
+			if (clanskaKarta.getIznajmljenjeKnjige().size() != 0) {
+			    for (Knjiga knjiga : clanskaKarta.getIznajmljenjeKnjige()) {
+			        retHTML += "<td>"+knjiga.getNaziv()+"</td>";
+			    }
+			} else {
+			    retHTML += "<td>Nema iznajmljenih knjiga</td>";
+			}
+					
+			retHTML	+= "<td><a href = " + bURL + "clanskekarte/details?id="+clanskaKarta.getId()+">Detalji</a></td>"
+					+ "</tr>";
 		}
 		
 		retHTML += "</table>"
@@ -176,6 +178,35 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		knjige.findOne(idknjige).setIzdata(true);
 		
 		response.sendRedirect(bURL + "clanskekarte");
+	}
+	
+	@GetMapping(value = "/details")
+	@ResponseBody
+	public String detalji(@RequestParam Long id) {
+		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+		ClanskaKarta clanskaKarta = clanskekarte.findOne(id);
+		String retHTML = "<!DOCTYPE html>\r\n"
+				+ "<html lang=\"en\">\r\n"
+				+ "<head>\r\n"
+				+ "    <meta charset=\"UTF-8\">\r\n"
+				+ "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n"
+				+ "    <title>Detalji clanske karte</title>\r\n"
+				+ "</head>\r\n"
+				+ "<body>\r\n"
+				+ "   <h1>Registarski broj: </h1>\r\n"
+				+ "   <p>"+clanskaKarta.getRegistarskiBroj()+"</p>\r\n"
+				+ "   <h1>Ime I prezime korisnika: </h1>\r\n"
+				+ "   <p>"+clanskaKarta.getKorisnik().getIme() + " " + clanskaKarta.getKorisnik().getPrezime() +"</p>\r\n"
+				+ "   <h1>Iznajmljene knjige: </h1>\r\n";
+		if (clanskaKarta.getIznajmljenjeKnjige().size() != 0) {
+		    for (Knjiga knjiga : clanskaKarta.getIznajmljenjeKnjige()) {
+		        retHTML += "<p>" + knjiga.getNaziv() + "</p>";
+		    }
+		} else {
+		    retHTML += "<p>Nema iznajmljenih knjiga na ovu clansku kartu!</p>";
+		}
+		retHTML += "</body>";
+		return retHTML;
 	}
 	
 }
