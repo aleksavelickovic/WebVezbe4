@@ -65,15 +65,15 @@ public class ClanskeKarteController implements ApplicationContextAware {
 
 		memorijaAplikacije.put(ClanskeKarteController.CKARTE_KEY, clanskekarte);
 		
-		ArrayList<Knjiga> knjigeUKorpi = new ArrayList<Knjiga>();
-		memorijaAplikacije.put("knjigeukorpi", knjigeUKorpi);
+//		ArrayList<Knjiga> knjigeUKorpi = new ArrayList<Knjiga>();
+//		memorijaAplikacije.put("knjigeukorpi", knjigeUKorpi);
 
 	}
 	@GetMapping
 	@ResponseBody
 	public String sveclanskekarte(HttpSession session){
 		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
-		session.setAttribute("korpa", memorijaAplikacije.get("knjigeukorpi"));
+//		session.setAttribute("korpa", memorijaAplikacije.get("knjigeukorpi"));
 		
 		String retHTML = "<!DOCTYPE html>\r\n"
 				+ "<html lang=\"en\">\r\n"
@@ -199,13 +199,16 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
 		Knjige knjige = Knjige.getInstance();
 //		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) memorijaAplikacije.get("knjigeukorpi");
-		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute("korpa");
 		
-		for (Knjiga knjiga : knjigeUKorpi) {
+		
+		for (Knjiga knjiga : (ArrayList<Knjiga>) session.getAttribute("korpa")) {
+//			Knjiga knjiga = knjige.findOne(i);
 			clanskekarte.findOne(id).getIznajmljenjeKnjige().add(knjiga);
 			knjiga.setIzdata(true);
-			knjigeUKorpi.remove(knjiga);
+//			((HashMap) session.getAttribute("korpa")).remove(knjiga);
 		}
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute("korpa");
+		knjigeUKorpi.clear();
 		response.sendRedirect(bURL + "clanskekarte");
 	}
 	
