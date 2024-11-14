@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
+import javax.validation.constraints.Null;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,13 +69,15 @@ public static final String KORPA_KEY = "korpa";
 		Knjige knjige = Knjige.getInstance();
 		ClanskeKarte clanskekarte = ClanskeKarte.getInstance();	
 		Korisnici korisnici = Korisnici.getInstance();
-		ArrayList<Knjiga> knjigeUKorpi = new ArrayList<Knjiga>();
 		
 		session.setAttribute(KNJIGE_KEY, knjige);
 		session.setAttribute(CKARTE_KEY, clanskekarte);
 		session.setAttribute(KORISNICI_KEY, korisnici);
-		session.setAttribute(KORPA_KEY, knjigeUKorpi);
 		
+		if(session.getAttribute(KORPA_KEY) == null) {  // Mora ovako, da ne bi pravio novu praznu listu i smestao je na sesiju svaki put kad se udje na pocetnu stranicu
+			ArrayList<Knjiga> knjigeUKorpi = new ArrayList<Knjiga>();
+			session.setAttribute(KORPA_KEY, knjigeUKorpi);
+		}
 		return "/index.html";
 	}
 

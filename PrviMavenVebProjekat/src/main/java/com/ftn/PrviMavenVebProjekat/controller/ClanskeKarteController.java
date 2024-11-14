@@ -250,7 +250,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	public void razduziKnjigu(@RequestParam Long id,@RequestParam Long idkarte , HttpServletResponse response, HttpServletRequest request, HttpSession session) throws IOException {
 		ClanskeKarte clanskekarte = (ClanskeKarte) session.getAttribute(GeneralController.CKARTE_KEY);
 		ClanskaKarta clanskaKarta = clanskekarte.findOne(idkarte);
-		Knjige knjige = (Knjige) session.getAttribute("knjige");
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
 		
 		clanskaKarta.getIznajmljenjeKnjige().remove(knjige.findOne(id));
 		knjige.findOne(id).setIzdata(false);
@@ -276,7 +276,8 @@ public class ClanskeKarteController implements ApplicationContextAware {
 				+ "<body>\r\n";
 		if (knjigeUKorpi.size() != 0) {		
 			for (Knjiga knjiga : knjigeUKorpi) {
-				retHTML += "<p>"+knjiga.getNaziv()+"</p>";
+				retHTML += "<p>"+knjiga.getNaziv()+"</p>"
+						+ "<a href="+bURL+"clanskekarte/ukloniizkorpe?id="+knjiga.getId()+">Ukloni iz korpe</a>";
 			}
 		}
 		else {
@@ -287,6 +288,16 @@ public class ClanskeKarteController implements ApplicationContextAware {
 				+ "</html>";
 		
 		return retHTML;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@GetMapping(value = "ukloniizkorpe")
+	public void ukloniizkorpe(@RequestParam Long id, HttpServletResponse response, HttpSession session) throws IOException {
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute(GeneralController.KORPA_KEY);
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
+		knjigeUKorpi.remove(knjige.findOne(id));
+		response.sendRedirect(bURL + "clanskekarte/korpa");
+		return;
 	}
 	
 }
