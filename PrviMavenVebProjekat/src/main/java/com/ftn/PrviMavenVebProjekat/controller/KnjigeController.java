@@ -189,6 +189,11 @@ public class KnjigeController implements ApplicationContextAware {
 	@PostMapping(value = "/delete")
 	public void delete(@RequestParam Long id, HttpServletResponse response, HttpSession session) throws IOException {
 		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute(GeneralController.KORPA_KEY);
+		if (knjigeUKorpi.contains(knjige) || knjige.findOne(id).isIzdata()) {
+			response.sendRedirect(bURL + "greskapribrisanju.html");
+			return;
+		}
 		knjige.delete(id);
 		response.sendRedirect(bURL + "knjige");
 	}
