@@ -3,6 +3,7 @@ package com.ftn.PrviMavenVebProjekat.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -194,11 +195,13 @@ public class KnjigeController implements ApplicationContextAware {
 
 	/** pribavnjanje HTML stanice za prikaz određenog entiteta , get zahtev */
 	// GET: knjige/details?id=1
+	@SuppressWarnings("unchecked")
 	@GetMapping(value = "/details")
 	@ResponseBody
 	public String details(@RequestParam Long id, HttpSession session) {
 		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
 		Knjiga knjiga = knjige.findOne(id);
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute(GeneralController.KORPA_KEY);
 
 		String retHTML = "<!DOCTYPE html>\r\n" + "<html>\r\n" + "<head>\r\n" + "<meta charset=\"UTF-8\">\r\n"
 				+ "<title>Prikaz detalja, izmena i brisanje knjige</title>\r\n" + "</head>\r\n" + "<body>\r\n"
@@ -214,7 +217,11 @@ public class KnjigeController implements ApplicationContextAware {
 				+ "		<input type = \"number\" name= \"brojStranica\" value=\"" + knjiga.getBrojStranica()
 				+ "\" /> <br>\r\n" + "		<input type = \"submit\" value = \"Potvrdi\"/>\r\n" + "	</form>\r\n"
 				+ "	<form action=\"/PrviMavenVebProjekat/knjige/delete?id=" + knjiga.getId() + "\" method=\"post\">\r\n"
-				+ "\r\n" + "		<input type = \"submit\" value = \"Obrisi ovu knjigu\"/>\r\n" + "	</form>";
+				+ "\r\n" + "		<input type = \"submit\" value = \"Obrisi ovu knjigu\"/>\r\n" + "	</form>"
+				+ "<br>";
+		if (knjigeUKorpi.contains(knjiga)) {
+			retHTML += "<a href="+bURL+"clanskekarte/ukloniizkorpe?id="+knjiga.getId()+">Ukloni iz korpe</a>";
+		}
 
 		if (knjiga.isIzdata() == false) {
 			retHTML += "<a href="+ bURL+ "clanskekarte/zaduzi?idknjige="+knjiga.getId()+">Zaduzi ovu knjigu</a>";
