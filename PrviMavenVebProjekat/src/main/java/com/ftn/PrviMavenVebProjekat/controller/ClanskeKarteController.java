@@ -35,20 +35,19 @@ import com.ftn.PrviMavenVebProjekat.model.Korisnik;
 @RequestMapping(value = "/clanskekarte")
 public class ClanskeKarteController implements ApplicationContextAware {
 	
-	public static final String CKARTE_KEY = "clanskekarte";
+//	public static final String CKARTE_KEY = "clanskekarte";
 	
 	
 
 	@Autowired
 	private ServletContext servletContext;
 	private String bURL;
-//	@Autowired
-//	private HttpSession session;
+
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	@Autowired
-	private ApplicationMemory memorijaAplikacije;
+//	@Autowired
+//	private ApplicationMemory memorijaAplikacije;
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -59,11 +58,11 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	@PostConstruct
 	public void init() {
 		bURL = servletContext.getContextPath() + "/";
-		memorijaAplikacije = applicationContext.getBean(ApplicationMemory.class);
-		ClanskeKarte clanskekarte = ClanskeKarte.getInstance();
-		Korisnici korisnici = Korisnici.getInstance();
-
-		memorijaAplikacije.put(ClanskeKarteController.CKARTE_KEY, clanskekarte);
+//		memorijaAplikacije = applicationContext.getBean(ApplicationMemory.class);
+//		ClanskeKarte clanskekarte = ClanskeKarte.getInstance();
+//		Korisnici korisnici = Korisnici.getInstance();
+//
+//		memorijaAplikacije.put(ClanskeKarteController.CKARTE_KEY, clanskekarte);
 		
 //		ArrayList<Knjiga> knjigeUKorpi = new ArrayList<Knjiga>();
 //		memorijaAplikacije.put("knjigeukorpi", knjigeUKorpi);
@@ -72,7 +71,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	@GetMapping
 	@ResponseBody
 	public String sveclanskekarte(HttpSession session){
-		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+		ClanskeKarte clanskekarte = (ClanskeKarte) session.getAttribute(GeneralController.CKARTE_KEY);
 //		session.setAttribute("korpa", memorijaAplikacije.get("knjigeukorpi"));
 		
 		String retHTML = "<!DOCTYPE html>\r\n"
@@ -119,7 +118,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	
 	@GetMapping(value = "/add")
 	@ResponseBody
-	public String create() {
+	public String create(HttpSession session) {
 		String retHTMl = "<!DOCTYPE html>\r\n"
 				+ "<html>\r\n"
 				+ "<head>\r\n"
@@ -132,7 +131,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 				+ "		<input type = \"text\" name= \"registarskibroj\" /> <br>\r\n"
 				+ "		<select name=\"korisnik\">\r\n";
 		
-		for (Korisnik korisnik : Korisnici.getInstance().findAll()) {
+		for (Korisnik korisnik : (ArrayList<Korisnik>) ((Korisnici) session.getAttribute(GeneralController.KORISNICI_KEY)).findAll()) {
 			retHTMl += "<option value=\""+ korisnik.getId() +"\">  "+korisnik.getIme()+" "+ " " +" "+korisnik.getPrezime()+" </option>";
 		}
 
@@ -148,9 +147,9 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	
 	@PostMapping(value = "/add")
 	@ResponseBody
-	public void create(@RequestParam String registarskibroj, @RequestParam Long korisnik, HttpServletResponse response)
+	public void create(@RequestParam String registarskibroj, @RequestParam Long korisnik, HttpServletResponse response, HttpSession session)
 			throws IOException {
-		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+		ClanskeKarte clanskekarte = (ClanskeKarte) session.getAttribute(GeneralController.CKARTE_KEY);
 		clanskekarte.save(new ClanskaKarta(null, registarskibroj, Korisnici.getInstance().findOne(korisnik), new ArrayList<Knjiga>()));
 		response.sendRedirect(bURL + "clanskekarte");
 		return;
@@ -179,43 +178,45 @@ public class ClanskeKarteController implements ApplicationContextAware {
 			
 		}
 	
+	@SuppressWarnings("unchecked")
 	@GetMapping(value = "/zaduzi")
 	public void zaduzi(@RequestParam Long idknjige, HttpServletResponse response, HttpSession session) throws IOException {
-		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
-		Knjige knjige = Knjige.getInstance();
-		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute("korpa");
+		ClanskeKarte clanskekarte = (ClanskeKarte) session.getAttribute(GeneralController.CKARTE_KEY);
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute(GeneralController.KORPA_KEY);
 //		session.setAttribute("korpa", knjigeUKorpi);
 		
 //		clanskekarte.findOne(id).getIznajmljenjeKnjige().add(knjige.findOne(idknjige));
-		knjige.findOne(idknjige).setIzdata(true);
 		
 		knjigeUKorpi.add(knjige.findOne(idknjige));
+		knjige.findOne(idknjige).setIzdata(true);
 		
 		response.sendRedirect(bURL + "clanskekarte");
 	}
 	
+	@SuppressWarnings("unchecked")
 	@GetMapping(value = "/zaduzisveknjige")
 	public void zaduzisve(@RequestParam Long id, HttpServletResponse response, HttpSession session) throws IOException {
-		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
-		Knjige knjige = Knjige.getInstance();
+		ClanskeKarte clanskekarte = (ClanskeKarte) session.getAttribute(GeneralController.CKARTE_KEY);
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
 //		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) memorijaAplikacije.get("knjigeukorpi");
 		
 		
-		for (Knjiga knjiga : (ArrayList<Knjiga>) session.getAttribute("korpa")) {
+		for (Knjiga knjiga : (ArrayList<Knjiga>) session.getAttribute(GeneralController.KORPA_KEY)) {
 //			Knjiga knjiga = knjige.findOne(i);
 			clanskekarte.findOne(id).getIznajmljenjeKnjige().add(knjiga);
 			knjiga.setIzdata(true);
 //			((HashMap) session.getAttribute("korpa")).remove(knjiga);
 		}
-		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute("korpa");
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute(GeneralController.KORPA_KEY);
 		knjigeUKorpi.clear();
 		response.sendRedirect(bURL + "clanskekarte");
 	}
 	
 	@GetMapping(value = "/details")
 	@ResponseBody
-	public String detalji(@RequestParam Long id) {
-		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+	public String detalji(@RequestParam Long id, HttpSession session) {
+		ClanskeKarte clanskekarte = (ClanskeKarte) session.getAttribute(GeneralController.CKARTE_KEY);
 		ClanskaKarta clanskaKarta = clanskekarte.findOne(id);
 		String retHTML = "<!DOCTYPE html>\r\n"
 				+ "<html lang=\"en\">\r\n"
@@ -246,10 +247,10 @@ public class ClanskeKarteController implements ApplicationContextAware {
 	}
 	
 	@GetMapping(value = "/razduzivanje")
-	public void razduziKnjigu(@RequestParam Long id,@RequestParam Long idkarte , HttpServletResponse response, HttpServletRequest request) throws IOException {
-		ClanskeKarte clanskekarte = (ClanskeKarte) memorijaAplikacije.get(CKARTE_KEY);
+	public void razduziKnjigu(@RequestParam Long id,@RequestParam Long idkarte , HttpServletResponse response, HttpServletRequest request, HttpSession session) throws IOException {
+		ClanskeKarte clanskekarte = (ClanskeKarte) session.getAttribute(GeneralController.CKARTE_KEY);
 		ClanskaKarta clanskaKarta = clanskekarte.findOne(idkarte);
-		Knjige knjige = Knjige.getInstance();
+		Knjige knjige = (Knjige) session.getAttribute("knjige");
 		
 		clanskaKarta.getIznajmljenjeKnjige().remove(knjige.findOne(id));
 		knjige.findOne(id).setIzdata(false);
@@ -258,10 +259,11 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		return;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@GetMapping(value = "/korpa")
 	@ResponseBody
 	public String korpa(HttpSession session) {
-		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute("korpa");
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute(GeneralController.KORPA_KEY);
 		String retHTML = "";
 		retHTML += "<!DOCTYPE html>\r\n"
 				+ "<html>\r\n"

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.swing.plaf.basic.BasicComboBoxUI.ListDataHandler;
 
 import org.jsoup.Jsoup;
@@ -36,7 +37,7 @@ import com.ftn.PrviMavenVebProjekat.model.Knjige;
 @RequestMapping(value = "/knjige")
 public class KnjigeController implements ApplicationContextAware {
 
-	public static final String KNJIGE_KEY = "knjige";
+//	public static final String KNJIGE_KEY = "knjige";
 
 	@Autowired
 	private ServletContext servletContext;
@@ -45,8 +46,8 @@ public class KnjigeController implements ApplicationContextAware {
 	@Autowired
 	private ApplicationContext applicationContext;
 
-	@Autowired
-	private ApplicationMemory memorijaAplikacije;
+//	@Autowired
+//	private ApplicationMemory memorijaAplikacije;
 
 	/** pristup ApplicationContext */
 	@Override
@@ -59,12 +60,12 @@ public class KnjigeController implements ApplicationContextAware {
 	@PostConstruct
 	public void init() {
 		bURL = servletContext.getContextPath() + "/";
-		memorijaAplikacije = applicationContext.getBean(ApplicationMemory.class);
-		Knjige knjige = Knjige.getInstance();
+//		memorijaAplikacije = applicationContext.getBean(ApplicationMemory.class);
+//		Knjige knjige = Knjige.getInstance();
 
 //		servletContext.setAttribute(KnjigeController.KNJIGE_KEY, knjige);	
 
-		memorijaAplikacije.put(KnjigeController.KNJIGE_KEY, knjige);
+//		memorijaAplikacije.put(KnjigeController.KNJIGE_KEY, knjige);
 	}
 
 	/**
@@ -75,10 +76,10 @@ public class KnjigeController implements ApplicationContextAware {
 	// GET: knjige
 	@GetMapping
 	@ResponseBody
-	public void index(HttpServletResponse response) throws IOException {
+	public void index(HttpServletResponse response, HttpSession session) throws IOException {
 		PrintWriter out = response.getWriter();
 
-		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
 
 		File htmlFile = new ClassPathResource("static/template.html").getFile();
 		Document document = Jsoup.parse(htmlFile, "UTF-8");
@@ -157,9 +158,9 @@ public class KnjigeController implements ApplicationContextAware {
 	@PostMapping(value = "/add")
 	@ResponseBody
 	public void create(@RequestParam String naziv, @RequestParam String registarskiBrojPrimerka,
-			@RequestParam String jezik, @RequestParam int brojStranica, HttpServletResponse response)
+			@RequestParam String jezik, @RequestParam int brojStranica, HttpServletResponse response, HttpSession session)
 			throws IOException {
-		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
 		knjige.save(new Knjiga(null, naziv, registarskiBrojPrimerka, jezik, brojStranica));
 		response.sendRedirect(bURL + "knjige");
 		return;
@@ -169,8 +170,8 @@ public class KnjigeController implements ApplicationContextAware {
 	/** obrada podataka forme za izmenu postojećeg entiteta, post zahtev */
 	// POST: knjige/edit
 	@PostMapping(value = "/edit")
-	public void edit(@ModelAttribute Knjiga knjigaEdited, HttpServletResponse response) throws IOException {
-		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
+	public void edit(@ModelAttribute Knjiga knjigaEdited, HttpServletResponse response, HttpSession session) throws IOException {
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
 		Knjiga knjigaOriginal = knjige.findOne(knjigaEdited.getId());
 
 		knjigaOriginal.setNaziv(knjigaEdited.getNaziv());
@@ -185,8 +186,8 @@ public class KnjigeController implements ApplicationContextAware {
 	/** obrada podataka forme za za brisanje postojećeg entiteta, post zahtev */
 	// POST: knjige/delete
 	@PostMapping(value = "/delete")
-	public void delete(@RequestParam Long id, HttpServletResponse response) throws IOException {
-		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
+	public void delete(@RequestParam Long id, HttpServletResponse response, HttpSession session) throws IOException {
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
 		knjige.delete(id);
 		response.sendRedirect(bURL + "knjige");
 	}
@@ -195,8 +196,8 @@ public class KnjigeController implements ApplicationContextAware {
 	// GET: knjige/details?id=1
 	@GetMapping(value = "/details")
 	@ResponseBody
-	public String details(@RequestParam Long id) {
-		Knjige knjige = (Knjige) memorijaAplikacije.get(KNJIGE_KEY);
+	public String details(@RequestParam Long id, HttpSession session) {
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
 		Knjiga knjiga = knjige.findOne(id);
 
 		String retHTML = "<!DOCTYPE html>\r\n" + "<html>\r\n" + "<head>\r\n" + "<meta charset=\"UTF-8\">\r\n"
