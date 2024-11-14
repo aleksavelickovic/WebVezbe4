@@ -290,8 +290,9 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		if (knjigeUKorpi.size() != 0) {		
 			for (Knjiga knjiga : knjigeUKorpi) {
 				retHTML += "<p>"+knjiga.getNaziv()+"</p>"
-						+ "<a href="+bURL+"clanskekarte/ukloniizkorpe?id="+knjiga.getId()+">Ukloni iz korpe</a>"
-								+ "<a href="+bURL+"clanskekarte/zaduzivanje?idknjige="+knjiga.getId()+">Zaduzi</a>";
+						+ "<a href="+bURL+"clanskekarte/ukloniizkorpe?id="+knjiga.getId()+">Ukloni iz korpe  </a>"
+						+ "<a href="+bURL+"clanskekarte/zaduzivanje?idknjige="+knjiga.getId()+">Zaduzi  </a>"
+						+ "<a href="+bURL+"knjige/details?id="+knjiga.getId()+">Detalji knjige  </a>";
 			}
 		}
 		else {
