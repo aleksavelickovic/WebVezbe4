@@ -166,7 +166,7 @@ public class ClanskeKarteController implements ApplicationContextAware {
 				+ "<title>DODAJ KNJIGU</title>\r\n"
 				+ "</head>\r\n"
 				+ "<body>\r\n"
-				+ "	<form action=\"" + bURL + "clanskekarte/zaduzi\" method=\"post\">\r\n"
+				+ "	<form action=\"" + bURL + "clanskekarte/zaduzijednu\" method=\"post\">\r\n"
 				+ "		<label for=\"naziv\">ID clankse karte: </label>\r\n"
 				+ "		<input type = \"number\" name= \"id\" /> <br>\r\n"
 				+ "		<input type = \"hidden\" name= \"idknjige\" value=\""+idknjige+"\" /> <br>\r\n"
@@ -177,6 +177,19 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		return retHTMl;
 			
 		}
+	
+	@SuppressWarnings("unchecked")
+	@PostMapping(value =  "/zaduzijednu")
+	public void zaduzijednu(@RequestParam Long idknjige, @RequestParam Long id,  HttpServletResponse response, HttpSession session) throws IOException {
+		ClanskeKarte clanskekarte = (ClanskeKarte) session.getAttribute(GeneralController.CKARTE_KEY);
+		Knjige knjige = (Knjige) session.getAttribute(GeneralController.KNJIGE_KEY);
+		ArrayList<Knjiga> knjigeUKorpi = (ArrayList<Knjiga>) session.getAttribute(GeneralController.KORPA_KEY);
+		
+		clanskekarte.findOne(id).getIznajmljenjeKnjige().add(knjige.findOne(idknjige));
+		knjigeUKorpi.remove(knjige.findOne(idknjige));
+		
+		response.sendRedirect(bURL + "clanskekarte");
+	}
 	
 	@SuppressWarnings("unchecked")
 	@GetMapping(value = "/zaduzi")
@@ -277,7 +290,8 @@ public class ClanskeKarteController implements ApplicationContextAware {
 		if (knjigeUKorpi.size() != 0) {		
 			for (Knjiga knjiga : knjigeUKorpi) {
 				retHTML += "<p>"+knjiga.getNaziv()+"</p>"
-						+ "<a href="+bURL+"clanskekarte/ukloniizkorpe?id="+knjiga.getId()+">Ukloni iz korpe</a>";
+						+ "<a href="+bURL+"clanskekarte/ukloniizkorpe?id="+knjiga.getId()+">Ukloni iz korpe</a>"
+								+ "<a href="+bURL+"clanskekarte/zaduzivanje?idknjige="+knjiga.getId()+">Zaduzi</a>";
 			}
 		}
 		else {
