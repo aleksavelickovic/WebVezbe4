@@ -1,20 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html data-bs-theme="light" lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>DODAJ KNJIGU</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>DODAJ NOVU KNJIGU</title>
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/fonts/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/fonts/ionicons.min.css">
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/css/aos.min.css">
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/css/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/css/gradient-navbar-styles.css">
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/css/gradient-navbar.css">
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/css/Navbar-Centered-Brand-Dark-icons.css">
+    <link rel="stylesheet" type="text/css" href="/PrviMavenVebProjekat/assets/css/Register-form.css">
 </head>
+
 <body>
-	<form action="/PrviMavenVebProjekat/knjige/add" method="post">
-		<label for="naziv">Naziv: </label>
-		<input type = "text" name= "naziv" /> <br>
-		<label for="registarskiBrojPrimerka">registarskiBrojPrimerka: </label>
-		<input type = "text" name= "registarskiBrojPrimerka" /> <br>
-		<label for="jezik">Jezik: </label>
-		<input type = "text" name= "jezik" /> <br>
-		<label for="brojStranica">Broj Stranica: </label>
-		<input type = "number" name= "brojStranica" /> <br>
-		<input type = "submit" value = "Dodaj"/>
-	</form>
+    <nav class="navbar navbar-expand-md bg-body navbar-dark" id="app-navbar">
+        <div class="container-fluid"><a class="navbar-brand" href="/PrviMavenVebProjekat/index.html"><i class="icon ion-ios-infinite" id="brand-logo"></i></a><button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link active" href="/PrviMavenVebProjekat/index.html">Pocetna</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/PrviMavenVebProjekat/knjige">Prikaz Svih Knjiga</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/PrviMavenVebProjekat/clanskekarte/korpa">Korpa</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="rf-register-form">
+        <form class="rg-form" method="post" action="/PrviMavenVebProjekat/knjige/add">
+            <h2 data-aos="fade-left">Dodaj knjigu</h2>
+            <div data-aos="fade-right" class="rf-input-container"><i class="fa fa-font-awesome fa fa-user rf-icon"></i><input class="form-control rf-input-field" type="text" placeholder="Naziv" name="naziv"></div>
+            <div data-aos="fade-right" class="rf-input-container"><i class="fa fa-sort-numeric-asc fa fa-envelope rf-icon"></i><input class="form-control rf-input-field" type="text" placeholder="Registarski Broj" name="registarskiBrojPrimerka"></div>
+            <div data-aos="zoom-in" class="rf-input-container"><i class="fa fa-file-text-o fa fa-key rf-icon"></i><input class="form-control rf-input-field" type="text" placeholder="Jezik" name="jezik"></div>
+            <div data-aos="zoom-in" class="rf-input-container"><i class="fa fa-book rf-icon"></i><input class="form-control rf-input-field" type="number" placeholder="Broj Stranica" name="brojStranica"></div><button class="btn btn-primary rf-btn" data-bss-hover-animate="pulse" type="submit">Potvrdi</button>
+        </form>
+    </div>
+    <script src="/PrviMavenVebProjekat/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/PrviMavenVebProjekat/assets/js/aos.min.js"></script>
+    <script src="/PrviMavenVebProjekat/assets/js/bs-init.js"></script>
 </body>
+
 </html>
